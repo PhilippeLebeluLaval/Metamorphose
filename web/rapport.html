@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TP3 — Métamorphose de Visages</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #1a1a25;
+      --accent: #c8f542;
+      --accent2: #42f5c8;
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --border: rgba(200,245,66,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── HEADER ─────────────────────────────────────── */
+    header {
+      position: relative;
+      z-index: 1;
+      padding: 80px 40px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .header-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-label::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .header-meta {
+      margin-top: 32px;
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .meta-item strong {
+      display: block;
+      color: var(--text);
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .header-divider {
+      max-width: 1100px;
+      margin: 0 auto 20px;
+      padding: 0 40px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent) 0%, transparent 60%);
+      opacity: 0.4;
+    }
+
+    /* ─── NAV ─────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,15,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+    }
+
+    nav a {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 16px 20px;
+      transition: color 0.2s, border-color 0.2s;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ─── SECTIONS ─────────────────────────────────────── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 40px 100px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section {
+      margin-bottom: 100px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .section-number {
+      font-family: 'Space Mono', monospace;
+      font-size: 60px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--accent);
+      opacity: 0.2;
+      flex-shrink: 0;
+      margin-top: -8px;
+    }
+
+    .section-title-block h2 {
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .section-title-block .tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--accent2);
+      text-transform: uppercase;
+      background: rgba(66,245,200,0.08);
+      border: 1px solid rgba(66,245,200,0.2);
+      padding: 3px 10px;
+      border-radius: 2px;
+    }
+
+    /* ─── IMAGE GRID ──────────────────────────────────── */
+    .image-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 600px) {
+      .image-pair { grid-template-columns: 1fr; }
+    }
+
+    .img-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .img-card:hover {
+      border-color: rgba(200,245,66,0.4);
+      transform: translateY(-3px);
+    }
+
+    .img-card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .img-label {
+      padding: 10px 14px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .img-label::before {
+      content: '↗';
+      color: var(--accent);
+    }
+
+    .arrow-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--accent);
+      opacity: 0.5;
+      margin: 4px 0;
+    }
+
+    /* ─── VIDEO BLOCK ─────────────────────────────────── */
+    .video-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .video-header {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .video-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .video-title::before {
+      content: '▶';
+      font-size: 10px;
+    }
+
+    .video-filename {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .video-block video {
+      width: 100%;
+      display: block;
+      max-height: 400px;
+      background: #000;
+    }
+
+    /* ─── DESCRIPTION BLOCK ───────────────────────────── */
+    .description-block {
+      background: var(--surface2);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 4px 4px 0;
+      padding: 24px 28px;
+    }
+
+    .description-block h3 {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .description-block p {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #b8b8cc;
+      font-weight: 400;
+    }
+
+    .description-block p + p {
+      margin-top: 12px;
+    }
+
+    /* ─── SECTION DIVIDER ─────────────────────────────── */
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin-bottom: 100px;
+    }
+
+    /* ─── FOOTER ──────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: gap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .footer-accent {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-label">Rapport de laboratoire</div>
+    <h1>TP3 — <span>Métamorphose</span><br>de Visages</h1>
+    <div class="header-meta">
+      <div class="meta-item"><strong>Étudiant</strong>Philippe Lebel (#14)</div>
+      <div class="meta-item"><strong>Cours</strong>Vision par ordinateur</div>
+      <div class="meta-item"><strong>Session</strong>Hiver 2025</div>
+    </div>
+  </header>
+  <div class="header-divider"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#s1">01 / Philippe → Roxanne</a>
+      <a href="#s2">02 / Normal → Fâché</a>
+      <a href="#s3">03 / PS4 → Xbox</a>
+      <a href="#s4">04 / Cosplay</a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- ── SECTION 1 ─────────────────────────────────── -->
+    <section class="section" id="s1">
+      <div class="section-header">
+        <div class="section-number">01</div>
+        <div class="section-title-block">
+          <h2>Métamorphose de Philippe<br>vers Roxanne</h2>
+          <span class="tag">Visage → Visage</span>
+        </div>
+      </div>
+
+      <div class="image-pair">
+        <div class="img-card">
+          <img src="images/14_Lebel_Philippe.jpg" alt="Philippe Lebel" onerror="this.style.background='#1a1a25'; this.style.height='280px'; this.alt='Image: 14_Lebel_Philippe.jpg'"/>
+          <div class="img-label">14_Lebel_Philippe.jpg</div>
+        </div>
+        <div class="img-card">
+          <img src="images//15_Maheu_Roxanne.jpg" alt="Roxanne Maheu" onerror="this.style.background='#1a1a25'; this.style.height='280px'; this.alt='Image: 15_Maheu_Roxanne.jpg'"/>
+          <div class="img-label">15_Maheu_Roxanne.jpg</div>
+        </div>
+      </div>
+
+      <div class="video-block">
+        <div class="video-header">
+          <span class="video-title">Vidéo de métamorphose</span>
+          <span class="video-filename">morph_Philippe_Roxanne.mp4</span>
+        </div>
+        <video controls>
+          <source src="images//morph_Philippe_Roxanne.mp4" type="video/mp4"/>
+          Votre navigateur ne supporte pas la lecture vidéo.
+        </video>
+      </div>
+
+      <div class="description-block">
+        <h3>Description des résultats</h3>
+        <p>
+          L'algorithme divise premièrement les deux images en plusieurs triangles en utilisant la triangulation de Delaunay. Ensuite pour chaque frame de la vidéo, l'algorithme calcule la forme intermédiaire pour chaque frame en variant le wrap_frac. La valeur du wrap_frac est calculé avec frame_courante / #_frame_totale (60). L'algorithme fait ensuite la même chose avec la transformation des couleurs en changeant la valeur du dissolve_frac.
+
+        </p>
+        <p>
+          La premiere métamorphose se fait entre moi et Roxanna Maheu. Je trouve la transition assez fluide pour le visage. La transition de la bouche et des yeux par exemple se fait d'une belle façon. Cependant, le cheveux de Roxanne apparaissent anormalement, mais je ne pouvais rien faire contre.
+        </p>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── SECTION 2 ─────────────────────────────────── -->
+    <section class="section" id="s2">
+      <div class="section-header">
+        <div class="section-number">02</div>
+        <div class="section-title-block">
+          <h2>Philippe Normal<br>vers Philippe Fâché</h2>
+          <span class="tag">Expression → Expression</span>
+        </div>
+      </div>
+
+      <div class="image-pair">
+        <div class="img-card">
+          <img src="images//14_Lebel_Philippe.jpg" alt="Philippe normal" onerror="this.style.background='#1a1a25'; this.style.height='280px'"/>
+          <div class="img-label">14_Lebel_Philippe.jpg</div>
+        </div>
+        <div class="img-card">
+          <img src="images//Philipe_Angry.jpg" alt="Philippe fâché" onerror="this.style.background='#1a1a25'; this.style.height='280px'"/>
+          <div class="img-label">Philippe_Angry.jpg</div>
+        </div>
+      </div>
+
+      <div class="video-block">
+        <div class="video-header">
+          <span class="video-title">Vidéo de métamorphose</span>
+          <span class="video-filename">morph_Philippe_Angry.mp4</span>
+        </div>
+        <video controls>
+          <source src="images//morph_Angry.mp4" type="video/mp4"/>
+          Votre navigateur ne supporte pas la lecture vidéo.
+        </video>
+      </div>
+
+      <div class="description-block">
+        <h3>Description des résultats</h3>
+        <p>
+          Métamorphose entre moi de la section d'avant et moi avec une expression de colère.
+        </p>
+        <p>
+          Le résultat est particulièrement convaincant puisque qu'il y a seulement ma bouche, mes yeux et mes sourcils qui doivent réelment se transformer. Le reste de mon visage guarde la même forme.
+        </p>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── SECTION 3 ─────────────────────────────────── -->
+    <section class="section" id="s3">
+      <div class="section-header">
+        <div class="section-number">03</div>
+        <div class="section-title-block">
+          <h2>Manette PS4<br>vers Manette Xbox</h2>
+          <span class="tag">Objet → Objet</span>
+        </div>
+      </div>
+
+      <div class="image-pair">
+        <div class="img-card">
+          <img src="images//PS4.png" alt="Manette PS4" onerror="this.style.background='#1a1a25'; this.style.height='280px'"/>
+          <div class="img-label">PS4.png</div>
+        </div>
+        <div class="img-card">
+          <img src="images//Xbox.png" alt="Manette Xbox" onerror="this.style.background='#1a1a25'; this.style.height='280px'"/>
+          <div class="img-label">Xbox.png</div>
+        </div>
+      </div>
+
+      <div class="video-block">
+        <div class="video-header">
+          <span class="video-title">Vidéo de métamorphose</span>
+          <span class="video-filename">morph_Controller.mp4</span>
+        </div>
+        <video controls>
+          <source src="images//morph_Controller.mp4" type="video/mp4"/>
+          Votre navigateur ne supporte pas la lecture vidéo.
+        </video>
+      </div>
+
+      <div class="description-block">
+        <h3>Description des résultats</h3>
+        <p>
+          Métamorphose entre une manette de PS4 et de Xbox.
+        </p>
+        <p>
+          Transition très étrange du au fait que le joystick de gauche ainsi que la croix directionelle des deux manettes sont à des positions différente.
+        </p>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── SECTION 4 ─────────────────────────────────── -->
+    <section class="section" id="s4">
+      <div class="section-header">
+        <div class="section-number">04</div>
+        <div class="section-title-block">
+          <h2>Cosplay Hitman<br>vers Cosplay Militaire</h2>
+          <span class="tag">Cosplay → Cosplay</span>
+        </div>
+      </div>
+
+      <div class="image-pair">
+        <div class="img-card">
+          <img src="images/Cosplay_Hitman.jpg" alt="Cosplay Hitman" onerror="this.style.background='#1a1a25'; this.style.height='280px'"/>
+          <div class="img-label">Cosplay_Hitman.jpg</div>
+        </div>
+        <div class="img-card">
+          <img src="images/Cosplay_Militaire.jpg" alt="Cosplay Militaire" onerror="this.style.background='#1a1a25'; this.style.height='280px'"/>
+          <div class="img-label">Cosplay_Militaire.jpg</div>
+        </div>
+      </div>
+
+      <div class="video-block">
+        <div class="video-header">
+          <span class="video-title">Vidéo de métamorphose</span>
+          <span class="video-filename">morph_Cosplay.mp4</span>
+        </div>
+        <video controls>
+          <source src="images/morph_Cosplay.mp4" type="video/mp4"/>
+          Votre navigateur ne supporte pas la lecture vidéo.
+        </video>
+      </div>
+
+      <div class="description-block">
+        <h3>Description des résultats</h3>
+        <p>
+          Métamorphose entre deux personnes en cosplay que j'ai pris à l'otakuthon 2025.
+        </p>
+        <p>
+          Les deux personnes ont une pose assez similaire donc la transition reste tout de même assez fluide
+        </p>
+      </div>
+
+
+    </section>
+
+      <div class="description-block">
+        <h3>Déclaration d'utilisation de L'IA</h3>
+        <p>
+          Dans le cadre de ce travail pratique, l'intelligence artificielle a été utilisée uniquement pour la conception visuelle et la mise en page du présent rapport HTML. Plus précisément, l'IA a généré la structure du document, le style graphique (couleurs, typographie, disposition des éléments) ainsi que la présentation générale des sections.
+        </p>
+      </div>
+
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-text">TP3 — Métamorphose de Visages &nbsp;·&nbsp; Philippe Lebel</div>
+    <div class="footer-accent">Hiver 2026</div>
+  </footer>
+
+</body>
+</html>
